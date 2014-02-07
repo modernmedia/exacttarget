@@ -85,8 +85,6 @@ abstract class EtBaseClass
                 throw new \Exception("Function ($verb) Not Defined");
             }
         } catch (\Exception $e) {
-            printf("ERROR:\n");
-            var_dump($e);
         }
     }
 

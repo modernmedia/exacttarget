@@ -8,6 +8,8 @@ use druid628\exactTarget\EtSimpleOperators;
 use druid628\exactTarget\EtTriggeredSend;
 use druid628\exactTarget\EtTriggeredSendDefinition;
 
+use Monolog\Logger;
+
 /**
  * EtClient - ExactTarget SOAP client
  *
@@ -64,6 +66,8 @@ class EtClient extends EtBaseClass
         "TriggeredSend",
     );
 
+    protected $log;
+
     /**
      * Build An authenticated SoapClient for use with Exact Target
      *
@@ -80,6 +84,14 @@ class EtClient extends EtBaseClass
         $this->client           = new EtSoapClient($this->wsdl, array('trace' => 1));
         $this->client->username = $username;
         $this->client->password = $password;
+
+        // create a log channel
+        $this->log = new Logger('exacttarget');
+    }
+
+    public function setHandler($handler)
+    {
+        $this->log->pushHandler($handler);
     }
 
     /**
@@ -131,8 +143,7 @@ class EtClient extends EtBaseClass
                 }
             }
         } catch (\Exception $e) {
-            printf("ERROR:\n");
-            var_dump($e);
+            $this->log->addInfo($e->getMessage);
         }
 
     }
@@ -381,14 +392,19 @@ class EtClient extends EtBaseClass
      */
     public function sendEmail($email, $sendType)
     {
-        $object = new \SoapVar($email, SOAP_ENC_OBJECT, $sendType, self::SOAPWSDL);
+        try {
+            $object = new \SoapVar($email, SOAP_ENC_OBJECT, $sendType, self::SOAPWSDL);
 
-        $soapRequest = new EtCreateRequest();
-        $soapRequest->setOptions(null);
-        $soapRequest->setObjects(array($object));
+            $soapRequest = new EtCreateRequest();
+            $soapRequest->setOptions(null);
+            $soapRequest->setObjects(array($object));
 
-        // executes Send
-        $results = $this->client->Create($soapRequest);
+            // executes Send
+            $results = $this->client->Create($soapRequest);
+        } catch(\SoapFault $e) {
+            $this->log->addInfo($e->getMessage);
+            return false;
+        }
 
         if ($results->OverallStatus == "OK") {
             return true;
@@ -431,9 +447,8 @@ class EtClient extends EtBaseClass
 
             return $lstProps;
         } catch (SoapFault $e) {
-            /* output the resulting SoapFault upon an error */
-            printf("ERROR:\n");
-            var_dump($e);
+            $this->log->addInfo($e->getMessage);
+            return false;
         }
     }
 
@@ -447,11 +462,11 @@ class EtClient extends EtBaseClass
     public function soapCall($object)
     {
         // get class of object, remove namespace, and strip off Et  .::.  Wicked voodoo magic
-        
+
         // Fix to avoid "Only variables can be passed by reference" error.
         $arr = explode('\\', get_class($object));
         $classType = substr(end($arr), 2);
-        
+
         $suds      = new \SoapVar($object, SOAP_ENC_OBJECT, $classType, self::SOAPWSDL);
 
         return $suds;
