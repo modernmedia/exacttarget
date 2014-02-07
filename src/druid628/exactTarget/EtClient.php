@@ -143,7 +143,7 @@ class EtClient extends EtBaseClass
                 }
             }
         } catch (\Exception $e) {
-            $this->log->addInfo($e->getMessage);
+            $this->log->addInfo($e->getMessage(), $e->getTrace());
         }
 
     }
@@ -402,7 +402,7 @@ class EtClient extends EtBaseClass
             // executes Send
             $results = $this->client->Create($soapRequest);
         } catch(\SoapFault $e) {
-            $this->log->addInfo($e->getMessage);
+            $this->log->addInfo($e->getMessage(), $e->getTrace());
             return false;
         }
 
@@ -447,7 +447,7 @@ class EtClient extends EtBaseClass
 
             return $lstProps;
         } catch (SoapFault $e) {
-            $this->log->addInfo($e->getMessage);
+            $this->log->addInfo($e->getMessage(), $e->getTrace());
             return false;
         }
     }
