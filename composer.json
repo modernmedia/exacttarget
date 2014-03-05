@@ -1,14 +1,14 @@
 {
-    "name": "dubcanada/exacttarget",
+    "name": "modernmedia/exacttarget",
     "type": "library",
     "keywords" : ["exact target", "exacttarget", "email", "api" ],
     "description": "Component library for ExactTarget API",
     "license": "MIT",
-    "homepage": "https://github.com/dubcanada/exacttarget",
+    "homepage": "https://github.com/modernmedia/exacttarget",
     "authors": [
         {
             "name": "Micah Breedlove",
-            "email": "druid628@gmail.com",
+            "email": "ModernMedia@gmail.com",
             "homepage": "http://micah.breedlove.in/"
         },
         {
@@ -30,7 +30,7 @@
     },
     "autoload": {
         "psr-0": {
-            "druid628\\exactTarget": "src/"
+            "ModernMedia\\exactTarget": "src/"
         }
     }
 }
